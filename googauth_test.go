@@ -18,7 +18,7 @@ var codeTests = []struct {
 func TestCode(t *testing.T) {
 
 	for _, v := range codeTests {
-		c := computeCode(v.secret, v.value)
+		c := ComputeCode(v.secret, v.value)
 
 		if c != v.code {
 			t.Errorf("computeCode(%s, %d): got %d expected %d\n", v.secret, v.value, c, v.code)

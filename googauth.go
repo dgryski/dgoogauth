@@ -7,7 +7,7 @@ import (
 	"encoding/binary"
 )
 
-func computeCode(secret string, value uint64) int {
+func ComputeCode(secret string, value uint64) int {
 
 	key, _ := base32.StdEncoding.DecodeString(secret)
 
