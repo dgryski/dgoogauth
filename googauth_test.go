@@ -6,7 +6,7 @@ import (
 
 var codeTests = []struct {
 	secret string
-	value  uint64
+	value  int64
 	code   int
 }{
 	// from http://code.google.com/p/google-authenticator/source/browse/libpam/pam_google_authenticator_unittest.c
@@ -24,5 +24,34 @@ func TestCode(t *testing.T) {
 			t.Errorf("computeCode(%s, %d): got %d expected %d\n", v.secret, v.value, c, v.code)
 		}
 
+	}
+}
+
+func TestScratchCode(t *testing.T) {
+
+	var cotp OTPConfig
+
+	cotp.ScratchCodes = []int{11112222, 22223333}
+
+	var scratchTests = []struct {
+		code   int
+		result bool
+	}{
+		{33334444, false},
+		{11112222, true},
+		{11112222, false},
+		{22223333, true},
+		{22223333, false},
+		{33334444, false},
+	}
+
+	for _, s := range scratchTests {
+		r, e := cotp.checkScratchCodes(s.code)
+		if r != s.result {
+			t.Errorf("scratchcode(%s) failed: got %s expected %s", s.code, r, s.result)
+		}
+		if e != nil {
+			t.Errorf("weird error from scratchcode(%s): got %s", s.code, e)
+		}
 	}
 }
