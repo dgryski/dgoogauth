@@ -3,7 +3,6 @@
 Dgoogauth is a Go implementation of the one-time password algorithms supported
 by the Google Authenticator project.
 
-
 */
 package dgoogauth
 
@@ -17,10 +16,9 @@ import (
 	"time"
 )
 
-// FIXME: Much of this code assumes int == int64, which probably is not the case.
+// Much of this code assumes int == int64, which probably is not the case.
 
 // ComputeCode computes the response code for a 64-bit challenge 'value' using the secret 'secret'
-// FIXME: really uint64?
 func ComputeCode(secret string, value int64) int {
 
 	key, _ := base32.StdEncoding.DecodeString(secret)
@@ -45,12 +43,15 @@ func (ErrInvalidCode) Error() string {
 	return "dgoogauth: invalid code"
 }
 
+// A one-time-password configuration.  This object will be modified by calls to
+// Authenticate and should be saved to ensure the codes are in fact only used
+// once.
 type OTPConfig struct {
-	Secret        string
-	WindowSize    int   // valid range: 0..100 or so
-	HotpCounter   int   // 0  == use timestamp
-	DisallowReuse []int // timestamps
-	ScratchCodes  []int
+	Secret        string // 80-bit base32 encoded string of the user's secret
+	WindowSize    int    // valid range: technically 0..100 or so, but beyond 3-5 is probably bad security
+	HotpCounter   int    // the current otp counter.  0 if the user uses time-based codes instead.
+	DisallowReuse []int  // timestamps in the current window unavailable for re-use
+	ScratchCodes  []int  // an array of 8-digit numeric codes that can be used to log in
 }
 
 func (c *OTPConfig) checkScratchCodes(code int) (bool, error) {
@@ -87,7 +88,6 @@ func (c *OTPConfig) checkHotpCode(code int) (bool, error) {
 
 func (c *OTPConfig) checkTotpCode(t0, code int) (bool, error) {
 
-	// FIXME: verify conditions are correct w/r/t valid window sizes
 	minT := t0 - (c.WindowSize / 2)
 	maxT := t0 + (c.WindowSize / 2)
 	for t := minT; t <= maxT; t++ {
@@ -120,6 +120,9 @@ func (c *OTPConfig) checkTotpCode(t0, code int) (bool, error) {
 	return false, nil
 }
 
+// Authenticate a one-time-password against the given OTPConfig
+// Returns true/false if the authentication was successful.
+// Returns error if the password is incorectly formatted (not a zero-padded 6 or non-zero-padded 8 digit number).
 func (c *OTPConfig) Authenticate(password string) (bool, error) {
 
 	var scratch bool
