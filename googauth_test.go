@@ -1,7 +1,9 @@
 package dgoogauth
 
 import (
+	"strconv"
 	"testing"
+	"time"
 )
 
 // Test vectors via:
@@ -166,4 +168,57 @@ func TestTotpCode(t *testing.T) {
 			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
+}
+
+func TestAuthenticate(t *testing.T) {
+
+	otpconf := &OTPConfig{
+		Secret:       "2SH3V3GDW7ZNMGYE",
+		WindowSize:   3,
+		HotpCounter:  1,
+		ScratchCodes: []int{11112222, 22223333},
+	}
+
+	type attempt struct {
+		code   string
+		result bool
+	}
+
+	var attempts = []attempt{
+		{"foobar", false},          // not digits
+		{"1fooba", false},          // not valid number
+		{"1111111", false},         // bad length
+		{ /* 1 */ "293240", true},  // hopt increments on success
+		{ /* 1 */ "293240", false}, // hopt failure
+		{"33334444", false},        // scratch
+		{"11112222", true},
+		{"11112222", false},
+	}
+
+	for _, a := range attempts {
+		r, _ := otpconf.Authenticate(a.code)
+		if r != a.result {
+			t.Errorf("bad result from code=%d: got %t expected %t\n", a.code, r, a.result)
+		}
+	}
+
+	// let's check some time-based codes
+	otpconf.HotpCounter = 0
+	// I haven't mocked the clock, so we'll just compute one
+	t0 := int64(time.Now().Unix() / 30)
+	c := ComputeCode(otpconf.Secret, t0)
+
+	invalid := c + 1
+	attempts = []attempt{
+		{strconv.Itoa(invalid), false},
+		{strconv.Itoa(c), true},
+	}
+
+	for _, a := range attempts {
+		r, _ := otpconf.Authenticate(a.code)
+		if r != a.result {
+			t.Errorf("bad result from code=%d: got %t expected %t\n", a.code, r, a.result)
+		}
+	}
+
 }
