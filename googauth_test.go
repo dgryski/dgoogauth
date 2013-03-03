@@ -51,10 +51,10 @@ func TestScratchCode(t *testing.T) {
 	for _, s := range scratchTests {
 		r, e := cotp.checkScratchCodes(s.code)
 		if r != s.result {
-			t.Errorf("scratchcode(%s) failed: got %t expected %t", s.code, r, s.result)
+			t.Errorf("scratchcode(%d) failed: got %t expected %t", s.code, r, s.result)
 		}
 		if e != nil {
-			t.Errorf("weird error from scratchcode(%s): got %s", s.code, e)
+			t.Errorf("weird error from scratchcode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -149,7 +149,7 @@ func TestTotpCode(t *testing.T) {
 			t.Errorf("timeCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
 		}
 		if len(cotp.DisallowReuse) != len(s.disallowed) {
-			t.Errorf("timeCode(%d) (step %d) failed: disallowReuse len mismatch: got %t expected %t", s.code, i, len(cotp.DisallowReuse), len(s.disallowed))
+			t.Errorf("timeCode(%d) (step %d) failed: disallowReuse len mismatch: got %d expected %d", s.code, i, len(cotp.DisallowReuse), len(s.disallowed))
 		} else {
 			same := true
 			for j := range s.disallowed {
