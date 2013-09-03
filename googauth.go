@@ -11,6 +11,7 @@ import (
 	"crypto/sha1"
 	"encoding/base32"
 	"encoding/binary"
+	"errors"
 	"sort"
 	"strconv"
 	"time"
@@ -37,11 +38,8 @@ func ComputeCode(secret string, value int64) int {
 	return int(code)
 }
 
-type ErrInvalidCode int
-
-func (ErrInvalidCode) Error() string {
-	return "dgoogauth: invalid code"
-}
+// ErrInvalidCode indicate the supplied one-time code was not valid
+var ErrInvalidCode = errors.New("invalid code")
 
 // A one-time-password configuration.  This object will be modified by calls to
 // Authenticate and should be saved to ensure the codes are in fact only used
@@ -134,13 +132,13 @@ func (c *OTPConfig) Authenticate(password string) (bool, error) {
 		scratch = true
 		break
 	default:
-		return false, ErrInvalidCode(0)
+		return false, ErrInvalidCode
 	}
 
 	code, err := strconv.Atoi(password)
 
 	if err != nil {
-		return false, ErrInvalidCode(0)
+		return false, ErrInvalidCode
 	}
 
 	if scratch {
