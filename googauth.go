@@ -1,8 +1,8 @@
+// Package dgoogauth implements the one-time password algorithms supported by Google Authenticator
 /*
-
-Dgoogauth is a Go implementation of the one-time password algorithms supported
-by the Google Authenticator project.
-
+This package supports the HMAC-Based One-time Password (HOTP) algorithm
+specified in RFC 4226 and the Time-based One-time Password (TOTP) algorithm
+specified in RFC 6238.
 */
 package dgoogauth
 
@@ -41,7 +41,7 @@ func ComputeCode(secret string, value int64) int {
 // ErrInvalidCode indicate the supplied one-time code was not valid
 var ErrInvalidCode = errors.New("invalid code")
 
-// A one-time-password configuration.  This object will be modified by calls to
+// OTPConfig is a one-time-password configuration.  This object will be modified by calls to
 // Authenticate and should be saved to ensure the codes are in fact only used
 // once.
 type OTPConfig struct {
