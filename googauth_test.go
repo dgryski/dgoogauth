@@ -198,7 +198,7 @@ func TestAuthenticate(t *testing.T) {
 	for _, a := range attempts {
 		r, _ := otpconf.Authenticate(a.code)
 		if r != a.result {
-			t.Errorf("bad result from code=%d: got %t expected %t\n", a.code, r, a.result)
+			t.Errorf("bad result from code=%s: got %t expected %t\n", a.code, r, a.result)
 		}
 	}
 
@@ -217,7 +217,7 @@ func TestAuthenticate(t *testing.T) {
 	for _, a := range attempts {
 		r, _ := otpconf.Authenticate(a.code)
 		if r != a.result {
-			t.Errorf("bad result from code=%d: got %t expected %t\n", a.code, r, a.result)
+			t.Errorf("bad result from code=%s: got %t expected %t\n", a.code, r, a.result)
 		}
 	}
 
