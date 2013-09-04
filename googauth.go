@@ -1,5 +1,6 @@
-// Package dgoogauth implements the one-time password algorithms supported by Google Authenticator
 /*
+Package dgoogauth implements the one-time password algorithms supported by Google Authenticator
+
 This package supports the HMAC-Based One-time Password (HOTP) algorithm
 specified in RFC 4226 and the Time-based One-time Password (TOTP) algorithm
 specified in RFC 6238.
