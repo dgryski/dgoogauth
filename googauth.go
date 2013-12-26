@@ -13,6 +13,7 @@ import (
 	"encoding/base32"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 	"time"
@@ -154,4 +155,15 @@ func (c *OTPConfig) Authenticate(password string) (bool, error) {
 	// assume we're on Time-basd OTP
 	t0 := int(time.Now().Unix() / 30)
 	return c.checkTotpCode(t0, code)
+}
+
+// ProvisionURI generates a URI that can be turned into a QR code to configure
+// a Google Authenticator mobile app.
+func (c *OTPConfig) ProvisionURI(user string) string {
+	if c.HotpCounter > 0 {
+		return fmt.Sprintf("otpauth://hotp/%s?counter=%d&secret=%s", user, c.HotpCounter, c.Secret)
+	}
+
+	return fmt.Sprintf("otpauth://totp/%s?secret=%s", user, c.Secret)
+
 }
