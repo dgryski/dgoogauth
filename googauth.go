@@ -121,7 +121,7 @@ func (c *OTPConfig) checkTotpCode(t0, code int) (bool, error) {
 
 // Authenticate a one-time-password against the given OTPConfig
 // Returns true/false if the authentication was successful.
-// Returns error if the password is incorectly formatted (not a zero-padded 6 or non-zero-padded 8 digit number).
+// Returns error if the password is incorrectly formatted (not a zero-padded 6 or non-zero-padded 8 digit number).
 func (c *OTPConfig) Authenticate(password string) (bool, error) {
 
 	var scratch bool
