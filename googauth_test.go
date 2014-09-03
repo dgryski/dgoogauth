@@ -51,12 +51,9 @@ func TestScratchCode(t *testing.T) {
 	}
 
 	for _, s := range scratchTests {
-		r, e := cotp.checkScratchCodes(s.code)
+		r := cotp.checkScratchCodes(s.code)
 		if r != s.result {
 			t.Errorf("scratchcode(%d) failed: got %t expected %t", s.code, r, s.result)
-		}
-		if e != nil {
-			t.Errorf("weird error from scratchcode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -85,15 +82,12 @@ func TestHotpCode(t *testing.T) {
 	}
 
 	for i, s := range counterCodes {
-		r, e := cotp.checkHotpCode(s.code)
+		r := cotp.checkHotpCode(s.code)
 		if r != s.result {
 			t.Errorf("counterCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
 		}
 		if cotp.HotpCounter != s.counter {
 			t.Errorf("hotpCounter incremented poorly: got %d expected %d", cotp.HotpCounter, s.counter)
-		}
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -121,12 +115,9 @@ func TestTotpCode(t *testing.T) {
 	}
 
 	for i, s := range windowTest {
-		r, e := cotp.checkTotpCode(s.t0, s.code)
+		r := cotp.checkTotpCode(s.t0, s.code)
 		if r != s.result {
 			t.Errorf("counterCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
-		}
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 
@@ -146,7 +137,7 @@ func TestTotpCode(t *testing.T) {
 	}
 
 	for i, s := range noreuseTest {
-		r, e := cotp.checkTotpCode(s.t0, s.code)
+		r := cotp.checkTotpCode(s.t0, s.code)
 		if r != s.result {
 			t.Errorf("timeCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
 		}
@@ -162,10 +153,6 @@ func TestTotpCode(t *testing.T) {
 			if !same {
 				t.Errorf("timeCode(%d) (step %d) failed: disallowReused: got %v expected %v", s.code, i, cotp.DisallowReuse, s.disallowed)
 			}
-		}
-
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 }
