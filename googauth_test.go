@@ -51,12 +51,9 @@ func TestScratchCode(t *testing.T) {
 	}
 
 	for _, s := range scratchTests {
-		r, e := cotp.checkScratchCodes(s.code)
+		r := cotp.checkScratchCodes(s.code)
 		if r != s.result {
 			t.Errorf("scratchcode(%d) failed: got %t expected %t", s.code, r, s.result)
-		}
-		if e != nil {
-			t.Errorf("weird error from scratchcode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -85,15 +82,12 @@ func TestHotpCode(t *testing.T) {
 	}
 
 	for i, s := range counterCodes {
-		r, e := cotp.checkHotpCode(s.code)
+		r := cotp.checkHotpCode(s.code)
 		if r != s.result {
 			t.Errorf("counterCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
 		}
 		if cotp.HotpCounter != s.counter {
 			t.Errorf("hotpCounter incremented poorly: got %d expected %d", cotp.HotpCounter, s.counter)
-		}
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -121,12 +115,9 @@ func TestTotpCode(t *testing.T) {
 	}
 
 	for i, s := range windowTest {
-		r, e := cotp.checkTotpCode(s.t0, s.code)
+		r := cotp.checkTotpCode(s.t0, s.code)
 		if r != s.result {
 			t.Errorf("counterCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
-		}
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 
@@ -146,7 +137,7 @@ func TestTotpCode(t *testing.T) {
 	}
 
 	for i, s := range noreuseTest {
-		r, e := cotp.checkTotpCode(s.t0, s.code)
+		r := cotp.checkTotpCode(s.t0, s.code)
 		if r != s.result {
 			t.Errorf("timeCode(%d) (step %d) failed: got %t expected %t", s.code, i, r, s.result)
 		}
@@ -162,10 +153,6 @@ func TestTotpCode(t *testing.T) {
 			if !same {
 				t.Errorf("timeCode(%d) (step %d) failed: disallowReused: got %v expected %v", s.code, i, cotp.DisallowReuse, s.disallowed)
 			}
-		}
-
-		if e != nil {
-			t.Errorf("weird error from checkHotpCode(%d): got %s", s.code, e)
 		}
 	}
 }
@@ -221,4 +208,32 @@ func TestAuthenticate(t *testing.T) {
 		}
 	}
 
+}
+
+func TestProvisionURI(t *testing.T) {
+	otpconf := OTPConfig{
+		Secret: "x",
+	}
+
+	cases := []struct {
+		user, iss string
+		hotp      bool
+		out       string
+	}{
+		{"test", "", false, "otpauth://totp/test?secret=x"},
+		{"test", "", true, "otpauth://hotp/test?counter=1&secret=x"},
+		{"test", "Company", true, "otpauth://hotp/Company:test?counter=1&issuer=Company&secret=x"},
+		{"test", "Company", false, "otpauth://totp/Company:test?issuer=Company&secret=x"},
+	}
+
+	for i, c := range cases {
+		otpconf.HotpCounter = 0
+		if c.hotp {
+			otpconf.HotpCounter = 1
+		}
+		got := otpconf.ProvisionURIWithIssuer(c.user, c.iss)
+		if got != c.out {
+			t.Errorf("%d: want %q, got %q", i, c.out, got)
+		}
+	}
 }
