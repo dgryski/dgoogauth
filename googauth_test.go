@@ -209,3 +209,31 @@ func TestAuthenticate(t *testing.T) {
 	}
 
 }
+
+func TestProvisionURI(t *testing.T) {
+	otpconf := OTPConfig{
+		Secret: "x",
+	}
+
+	cases := []struct {
+		user, iss string
+		hotp      bool
+		out       string
+	}{
+		{"test", "", false, "otpauth://totp/test?secret=x"},
+		{"test", "", true, "otpauth://hotp/test?counter=1&secret=x"},
+		{"test", "Company", true, "otpauth://hotp/Company:test?counter=1&issuer=Company&secret=x"},
+		{"test", "Company", false, "otpauth://totp/Company:test?issuer=Company&secret=x"},
+	}
+
+	for i, c := range cases {
+		otpconf.HotpCounter = 0
+		if c.hotp {
+			otpconf.HotpCounter = 1
+		}
+		got := otpconf.ProvisionURIWithIssuer(c.user, c.iss)
+		if got != c.out {
+			t.Errorf("%d: want %q, got %q", i, c.out, got)
+		}
+	}
+}

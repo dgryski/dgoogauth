@@ -13,7 +13,7 @@ import (
 	"encoding/base32"
 	"encoding/binary"
 	"errors"
-	"fmt"
+	"net/url"
 	"sort"
 	"strconv"
 	"time"
@@ -169,9 +169,26 @@ func (c *OTPConfig) Authenticate(password string) (bool, error) {
 // ProvisionURI generates a URI that can be turned into a QR code to configure
 // a Google Authenticator mobile app.
 func (c *OTPConfig) ProvisionURI(user string) string {
+	return c.ProvisionURIWithIssuer(user, "")
+}
+
+// ProvisionURIWithIssuer generates a URI that can be turned into a QR code
+// to configure a Google Authenticator mobile app. It respects the recommendations
+// on how to avoid conflicting accounts.
+//
+// See https://code.google.com/p/google-authenticator/wiki/ConflictingAccounts
+func (c *OTPConfig) ProvisionURIWithIssuer(user string, issuer string) string {
+	auth := "totp/"
+	q := make(url.Values)
 	if c.HotpCounter > 0 {
-		return fmt.Sprintf("otpauth://hotp/%s?counter=%d&secret=%s", user, c.HotpCounter, c.Secret)
+		auth = "hotp/"
+		q.Add("counter", strconv.Itoa(c.HotpCounter))
+	}
+	q.Add("secret", c.Secret)
+	if issuer != "" {
+		q.Add("issuer", issuer)
+		auth += issuer + ":"
 	}
 
-	return fmt.Sprintf("otpauth://totp/%s?secret=%s", user, c.Secret)
+	return "otpauth://" + auth + user + "?" + q.Encode()
 }
