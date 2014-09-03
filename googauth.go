@@ -22,7 +22,7 @@ import (
 // Much of this code assumes int == int64, which probably is not the case.
 
 // ComputeCode computes the response code for a 64-bit challenge 'value' using the secret 'secret'.
-// To avoid breaking compatibility with previous API, return an invalid code when an error occurs,
+// To avoid breaking compatibility with previous API, return an invalid code (-1) when an error occurs,
 // but do not silently ignore them (force a mismatch).
 func ComputeCode(secret string, value int64) int {
 
