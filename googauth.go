@@ -22,13 +22,12 @@ import (
 // Much of this code assumes int == int64, which probably is not the case.
 
 // ComputeCode computes the response code for a 64-bit challenge 'value' using the secret 'secret'.
-// To avoid breaking compatibility with previous API, return an invalid code (-1) when an error occurs,
-// but do not silently ignore them (force a mismatch).
+// To avoid breaking compatibility with the previous API, it returns an invalid code (-1) when an error occurs,
+// but does not silently ignore them (it forces a mismatch so the code will be rejected).
 func ComputeCode(secret string, value int64) int {
 
 	key, err := base32.StdEncoding.DecodeString(secret)
 	if err != nil {
-		// I *think* hotp and totp codes are always unsigned
 		return -1
 	}
 
