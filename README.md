@@ -8,7 +8,7 @@ This code is licensed under the Apache License, version 2.0
 It implements the one-time-password algorithms specified in:
 
 * RFC 4226 (HOTP: An HMAC-Based One-Time Password Algorithm)
-* RTC 6238 (TOTP: Time-Based One-Time Password Algorithm)
+* RFC 6238 (TOTP: Time-Based One-Time Password Algorithm)
 
 You can learn more about the Google Authenticator library at its project page:
 
