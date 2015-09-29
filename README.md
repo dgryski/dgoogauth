@@ -12,4 +12,4 @@ It implements the one-time-password algorithms specified in:
 
 You can learn more about the Google Authenticator library at its project page:
 
-* http://code.google.com/p/google-authenticator/
+* https://github.com/google/google-authenticator
