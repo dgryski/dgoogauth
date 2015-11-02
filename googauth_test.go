@@ -192,7 +192,7 @@ func TestAuthenticate(t *testing.T) {
 	// let's check some time-based codes
 	otpconf.HotpCounter = 0
 	// I haven't mocked the clock, so we'll just compute one
-	t0 := int64(time.Now().Unix() / 30)
+	t0 := int64(time.Now().UTC().Unix() / 30)
 	c := ComputeCode(otpconf.Secret, t0)
 
 	invalid := c + 1
