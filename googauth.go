@@ -60,6 +60,7 @@ type OTPConfig struct {
 	HotpCounter   int    // the current otp counter.  0 if the user uses time-based codes instead.
 	DisallowReuse []int  // timestamps in the current window unavailable for re-use
 	ScratchCodes  []int  // an array of 8-digit numeric codes that can be used to log in
+	UTC           bool   // use UTC for the timestamp instead of local time
 }
 
 func (c *OTPConfig) checkScratchCodes(code int) bool {
@@ -160,8 +161,13 @@ func (c *OTPConfig) Authenticate(password string) (bool, error) {
 		return c.checkHotpCode(code), nil
 	}
 
-	// assume we're on Time-basd OTP
-	t0 := int(time.Now().UTC().Unix() / 30)
+	var t0 int
+	// assume we're on Time-based OTP
+	if c.UTC {
+		t0 = int(time.Now().UTC().Unix() / 30)
+	} else {
+		t0 = int(time.Now().Unix() / 30)
+	}
 	return c.checkTotpCode(t0, code), nil
 }
 

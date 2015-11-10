@@ -192,7 +192,12 @@ func TestAuthenticate(t *testing.T) {
 	// let's check some time-based codes
 	otpconf.HotpCounter = 0
 	// I haven't mocked the clock, so we'll just compute one
-	t0 := int64(time.Now().UTC().Unix() / 30)
+	var t0 int64
+	if otpconf.UTC {
+		t0 = int64(time.Now().UTC().Unix() / 30)
+	} else {
+		t0 = int64(time.Now().Unix() / 30)
+	}
 	c := ComputeCode(otpconf.Secret, t0)
 
 	invalid := c + 1
@@ -206,6 +211,13 @@ func TestAuthenticate(t *testing.T) {
 		if r != a.result {
 			t.Errorf("bad result from code=%s: got %t expected %t\n", a.code, r, a.result)
 		}
+
+		otpconf.UTC = true
+		r, _ = otpconf.Authenticate(a.code)
+		if r != a.result {
+			t.Errorf("bad result from code=%s: got %t expected %t\n", a.code, r, a.result)
+		}
+		otpconf.UTC = false
 	}
 
 }
