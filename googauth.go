@@ -161,7 +161,7 @@ func (c *OTPConfig) Authenticate(password string) (bool, error) {
 	}
 
 	// assume we're on Time-basd OTP
-	t0 := int(time.Now().Unix() / 30)
+	t0 := int(time.Now().UTC().Unix() / 30)
 	return c.checkTotpCode(t0, code), nil
 }
 
